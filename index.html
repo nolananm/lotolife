@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LotoLife - Les Lotos</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .loto-list { 
+            display: grid; 
+            gap: 20px; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            margin-top: 2rem;
+        }
+        .loto-card { 
+            cursor: pointer; 
+            text-decoration: none; 
+            display: block; 
+            transition: transform 0.2s;
+        }
+        .loto-card:hover { 
+            transform: scale(1.05); 
+        }
+        .loto-card h3 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="client-header">
+        <h1>🎱 LotoLife 🎁</h1>
+        <p style="font-family: 'Poppins', sans-serif; font-size: 1.2rem; margin: 0; text-shadow: 1px 1px 0 #000;">Choisis ton prochain Loto !</p>
+    </header>
+
+    <main>
+        <div id="lotosContainer" class="loto-list">
+            <h2 style="text-align:center; width: 100%;">Chargement des lotos...</h2>
+        </div>
+    </main>
+
+    <script type="module">
+        import { supabase } from './supabase.js';
+        
+        async function loadLotos() {
+            const container = document.getElementById('lotosContainer');
+            
+            // On récupère tous les lotos publiés, triés par date
+            const { data, error } = await supabase
+                .from('events')
+                .select('*')
+                .eq('is_published', true)
+                .order('date_event', { ascending: true });
+
+            if (error || !data || data.length === 0) {
+                container.innerHTML = '<h2 style="text-align:center; width: 100%;">Aucun loto de prévu pour le moment 😢</h2>';
+                return;
+            }
+
+            container.innerHTML = '';
+            
+            // On génère une carte pour chaque loto
+            data.forEach(loto => {
+                const date = new Date(loto.date_event);
+                const dateStr = date.toLocaleDateString('fr-FR');
+                const timeStr = date.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+                
+                // Le lien pointe vers loto.html avec l'ID en paramètre (ex: loto.html?id=1234)
+                container.innerHTML += `
+                    <a href="loto.html?id=${loto.id}" class="card loto-card">
+                        <h3>${loto.title}</h3>
+                        <p style="font-size: 1.2rem; font-weight: bold; color: var(--loto-blue);">📅 Le ${dateStr} à ${timeStr}</p>
+                        <p style="color: var(--text-dark); font-family: 'Poppins', sans-serif;">Prix du carton : <strong>${loto.card_price}€</strong></p>
+                        <button style="width: 100%; margin-top: 15px; pointer-events: none;">Voir ce loto</button>
+                    </a>
+                `;
+            });
+        }
+
+        loadLotos();
+    </script>
+</body>
+</html>
