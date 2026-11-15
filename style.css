@@ -21,7 +21,6 @@ body {
     margin: 0;
     padding: 0;
 }
-
 /* En-têtes façon affiche "Jackpot / Super Loto" */
 .client-header, .admin-header {
     background: linear-gradient(135deg, var(--primary-color), #cc0044);
