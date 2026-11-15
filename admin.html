@@ -3,13 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - LotoLife</title>
+    <title>Admin Salles - LotoLife</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header class="admin-header">
-        <h1>🎪 LotoLife Admin - Création de Salle</h1>
+        <h1>🛠️ LotoLife Admin</h1>
     </header>
+    
+    <!-- Menu de navigation Admin -->
+    <nav style="text-align: center; margin: 2rem 0; gap: 15px; display: flex; justify-content: center;">
+        <a href="admin.html"><button style="background-color: var(--text-dark);">🏢 1. Créer une Salle</button></a>
+        <a href="admin-events.html"><button>🎟️ 2. Créer un Loto</button></a>
+    </nav>
     
     <main>
         <section class="card">
@@ -17,17 +23,17 @@
             <input type="text" id="venueName" placeholder="Nom de la salle (ex: Salle des Fêtes de Brive)" style="width: 100%; max-width: 400px;">
             
             <div style="margin-top: 1rem;">
-                <label>Lignes : <input type="number" id="gridRows" value="10" min="1"></label>
-                <label>Colonnes : <input type="number" id="gridCols" value="15" min="1"></label>
-                <button id="generateGridBtn">Générer le plan vide</button>
+                <label>Lignes (Profondeur) : <input type="number" id="gridRows" value="8" min="1"></label>
+                <label>Colonnes (Largeur) : <input type="number" id="gridCols" value="20" min="1"></label>
+                <button id="generateGridBtn" style="font-size: 1rem; padding: 0.5rem 1rem;">Générer la grille</button>
             </div>
         </section>
 
         <section class="card">
-            <h2>2. Dessiner le Plan (Façon Ticketmaster)</h2>
-            <p>Clique sur la grille pour placer ou retirer une chaise. (Rouge = Place active, Gris = Vide)</p>
+            <h2>2. Placer les jetons (Plan de table)</h2>
+            <p>Clique sur la grille pour ajouter/retirer une place. Laisse des lignes vides pour créer les allées entre les longues tables.</p>
             <div id="seatGrid" class="seat-grid"></div>
-            <button id="saveVenueBtn" style="margin-top: 1rem; width: 100%; padding: 1rem; font-size: 1.1rem;">Enregistrer la salle et les places</button>
+            <button id="saveVenueBtn" style="margin-top: 1.5rem; width: 100%; padding: 1rem; font-size: 1.5rem;">Enregistrer la salle et les jetons</button>
         </section>
     </main>
 
