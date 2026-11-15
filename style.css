@@ -1,196 +1,75 @@
-@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Poppins:wght@400;600;800&family=Luckiest+Guy&display=swap');
-
-:root {
-    --primary-color: #FF0055; /* Rose/Rouge explosif */
-    --secondary-color: #FFD700; /* Jaune or (Gros lot) */
-    --loto-blue: #0088FF; /* Bleu jeton */
-    --loto-green: #00CC66; /* Vert chance */
-    --bg-color: #f0f0f5;
-    --text-dark: #1a1a1a;
-}
-
-body {
-    font-family: 'Poppins', sans-serif;
-    background-color: var(--bg-color);
-    /* Motif de fond : Pois façon boules de loto */
-    background-image: radial-gradient(var(--secondary-color) 10%, transparent 11%),
-                      radial-gradient(var(--secondary-color) 10%, transparent 11%);
-    background-size: 60px 60px;
-    background-position: 0 0, 30px 30px;
-    color: var(--text-dark);
-    margin: 0;
-    padding: 0;
-}
-/* En-têtes façon affiche "Jackpot / Super Loto" */
-.client-header, .admin-header {
-    background: linear-gradient(135deg, var(--primary-color), #cc0044);
-    color: white;
+/* --- CONSTRUCTEUR DE TABLES LOTO --- */
+.room-plan {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
     padding: 2rem;
-    text-align: center;
-    border-bottom: 8px solid var(--secondary-color);
-    font-family: 'Luckiest Guy', cursive;
-    font-size: 2.5rem;
-    letter-spacing: 2px;
-    text-shadow: 3px 3px 0px #000;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
-}
-
-/* Les cartes façon "Carton de Loto" géant */
-.card {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    margin-bottom: 2rem;
-    border: 4px solid var(--text-dark);
-    box-shadow: 8px 8px 0px var(--loto-blue);
-    position: relative;
-    overflow: hidden;
-    /* Léger quadrillage en fond de carte */
-    background-image: linear-gradient(#f9f9f9 2px, transparent 2px), linear-gradient(90deg, #f9f9f9 2px, transparent 2px);
-    background-size: 30px 30px;
-}
-
-h1, h2, h3 {
-    font-family: 'Luckiest Guy', cursive;
-    color: var(--primary-color);
-    text-shadow: 2px 2px 0px var(--secondary-color);
-    margin-top: 0;
-    letter-spacing: 1px;
-}
-
-h1 {
-    font-size: 3.5rem;
-    margin-bottom: 0.5rem;
-}
-
-/* Le compte à rebours façon tirage au sort */
-.countdown-container {
-    text-align: center;
-    margin: 2rem auto;
-    padding: 2rem;
-    background: var(--text-dark);
-    color: white;
-    border-radius: 50px;
-    border: 6px solid var(--secondary-color);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-    max-width: 600px;
-}
-
-#countdownTimer {
-    font-family: 'Bangers', cursive;
-    font-size: 3.5rem;
-    color: var(--secondary-color);
-    letter-spacing: 5px;
-    text-shadow: 2px 2px 0px #000;
-    display: inline-block;
-    background: var(--primary-color);
-    padding: 10px 30px;
-    border-radius: 40px; /* Forme de grosse pilule/boule */
-    border: 3px solid white;
-    margin-top: 10px;
-}
-
-input, select {
-    padding: 0.8rem;
-    margin: 0.5rem 0;
-    border-radius: 8px;
-    border: 2px solid #ccc;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    font-size: 1rem;
-    background-color: #fff;
-    transition: all 0.3s;
-}
-
-input:focus, select:focus {
-    outline: none;
-    border-color: var(--loto-blue);
-    box-shadow: 0 0 8px rgba(0, 136, 255, 0.4);
-}
-
-/* Boutons explosifs mais ronds comme des jetons */
-button {
-    background-color: var(--loto-green);
-    color: white;
-    border: 3px solid var(--text-dark);
-    padding: 1rem 2rem;
-    border-radius: 50px;
-    cursor: pointer;
-    font-family: 'Luckiest Guy', cursive;
-    font-size: 1.5rem;
-    letter-spacing: 1px;
-    text-shadow: 2px 2px 0px #000;
-    box-shadow: 4px 4px 0px var(--text-dark);
-    transition: all 0.1s ease-in-out;
-    margin-top: 10px;
-}
-
-button:hover {
-    transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0px var(--text-dark);
-    background-color: #00aa55;
-}
-
-button:active {
-    transform: translate(4px, 4px);
-    box-shadow: 0px 0px 0px var(--text-dark);
-}
-
-/* La grille de places modifiée */
-.seat-grid {
-    display: grid;
-    gap: 10px;
-    margin-top: 1.5rem;
+    background-color: #f8f9fa;
+    border: 3px dashed var(--text-dark);
+    border-radius: 10px;
+    min-height: 300px;
     justify-content: center;
-    overflow-x: auto;
-    padding: 1.5rem;
-    background-color: #fff;
-    border-radius: 8px;
-    border: 3px solid var(--text-dark);
 }
 
-/* Les places deviennent des jetons ronds */
-.seat-cell {
+.loto-table-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+}
+
+.loto-chair-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.loto-table-surface {
+    background: #d4a373; /* Couleur table en bois */
+    border: 3px solid #8b5a2b;
+    border-radius: 4px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Luckiest Guy', cursive;
+    color: white;
+    text-shadow: 1px 1px 0 #000;
+    font-size: 1.2rem;
+    width: 100%;
+    min-width: 150px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.chair {
     width: 35px;
     height: 35px;
-    background-color: #e0e0e0;
-    border: 3px solid #999;
-    cursor: pointer;
-    border-radius: 50%; /* Rond parfait */
-    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background-color: var(--loto-blue);
+    border: 3px solid var(--text-dark);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 0.8rem;
+    box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2);
 }
 
-.seat-cell:hover {
-    transform: scale(1.2) translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-}
-
-/* Jeton sélectionné */
-.seat-cell.active {
-    background-color: var(--primary-color);
-    border-color: #000;
-    box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2), 0 3px 6px rgba(255,0,85,0.5);
-}
-
-/* Cadenas Vente fermée */
-.locked {
-    opacity: 0.8;
-    pointer-events: none;
-    position: relative;
-}
-.locked::after {
-    content: '🔒 Bientôt !';
+.delete-table-btn {
     position: absolute;
     top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    right: -40px;
+    transform: translateY(-50%);
     background: var(--primary-color);
-    border: 4px solid var(--secondary-color);
     color: white;
-    padding: 1.5rem 3rem;
-    border-radius: 50px;
-    font-family: 'Luckiest Guy', cursive;
-    font-size: 2rem;
-    text-shadow: 2px 2px 0px #000;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 0;
+    box-shadow: 2px 2px 0 #000;
 }
