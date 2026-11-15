@@ -1,47 +1,104 @@
 import { supabase } from './supabase.js';
 
-const gridRowsInput = document.getElementById('gridRows');
-const gridColsInput = document.getElementById('gridCols');
-const generateGridBtn = document.getElementById('generateGridBtn');
-const seatGrid = document.getElementById('seatGrid');
-const saveVenueBtn = document.getElementById('saveVenueBtn');
 const venueNameInput = document.getElementById('venueName');
+const tableNameInput = document.getElementById('tableNameInput');
+const tableSeatsInput = document.getElementById('tableSeatsInput');
+const addTableBtn = document.getElementById('addTableBtn');
+const roomPlan = document.getElementById('roomPlan');
+const saveVenueBtn = document.getElementById('saveVenueBtn');
 
-let currentGrid = [];
+let tables = [];
 
-generateGridBtn.addEventListener('click', () => {
-    const rows = parseInt(gridRowsInput.value);
-    const cols = parseInt(gridColsInput.value);
+// Fonction pour dessiner le plan
+function renderPlan() {
+    roomPlan.innerHTML = '';
     
-    seatGrid.style.gridTemplateColumns = `repeat(${cols}, 30px)`;
-    seatGrid.innerHTML = '';
-    currentGrid = [];
-
-    for (let r = 0; r < rows; r++) {
-        const rowArray = [];
-        for (let c = 0; c < cols; c++) {
-            const cell = document.createElement('div');
-            cell.classList.add('seat-cell');
-            cell.dataset.r = r;
-            cell.dataset.c = c;
-            
-            // Logique pour activer/désactiver une place
-            cell.addEventListener('click', function() {
-                this.classList.toggle('active');
-                rowArray[c] = this.classList.contains('active') ? 1 : 0;
-            });
-
-            seatGrid.appendChild(cell);
-            rowArray.push(0);
-        }
-        currentGrid.push(rowArray);
+    if (tables.length === 0) {
+        roomPlan.innerHTML = '<p style="color: #666; font-style: italic;">Le plan est vide. Ajoute une table ci-dessus.</p>';
+        return;
     }
+
+    tables.forEach((table, index) => {
+        const tableGroup = document.createElement('div');
+        tableGroup.classList.add('loto-table-group');
+
+        // Ligne du haut (Moitié des chaises)
+        const topRow = document.createElement('div');
+        topRow.classList.add('loto-chair-row');
+        const halfSeats = Math.ceil(table.seats / 2);
+        
+        for(let i = 1; i <= halfSeats; i++) {
+            const chair = document.createElement('div');
+            chair.classList.add('chair');
+            chair.textContent = i;
+            topRow.appendChild(chair);
+        }
+
+        // La table elle-même
+        const tableSurface = document.createElement('div');
+        tableSurface.classList.add('loto-table-surface');
+        tableSurface.textContent = table.name;
+        // Ajuste la largeur de la table en fonction du nombre de chaises
+        tableSurface.style.width = `${halfSeats * 45}px`; 
+
+        // Ligne du bas (L'autre moitié)
+        const bottomRow = document.createElement('div');
+        bottomRow.classList.add('loto-chair-row');
+        
+        for(let i = halfSeats + 1; i <= table.seats; i++) {
+            const chair = document.createElement('div');
+            chair.classList.add('chair');
+            chair.textContent = i;
+            bottomRow.appendChild(chair);
+        }
+
+        // Bouton supprimer
+        const deleteBtn = document.createElement('button');
+        deleteBtn.classList.add('delete-table-btn');
+        deleteBtn.textContent = 'X';
+        deleteBtn.onclick = () => {
+            tables.splice(index, 1);
+            renderPlan();
+        };
+
+        tableGroup.appendChild(topRow);
+        tableGroup.appendChild(tableSurface);
+        tableGroup.appendChild(bottomRow);
+        tableGroup.appendChild(deleteBtn);
+
+        roomPlan.appendChild(tableGroup);
+    });
+}
+
+// Ajouter une table
+addTableBtn.addEventListener('click', () => {
+    const name = tableNameInput.value.trim();
+    const seats = parseInt(tableSeatsInput.value);
+
+    if (!name) {
+        alert('Donne un nom à la table !');
+        return;
+    }
+
+    tables.push({ name: name, seats: seats });
+    
+    // Reset de l'input pour la prochaine table
+    let nextTableChar = String.fromCharCode(name.charCodeAt(0) + 1);
+    if(name.length > 1) nextTableChar = 'Table'; // Fallback simple
+    tableNameInput.value = ''; 
+    
+    renderPlan();
 });
 
+// Sauvegarder dans Supabase
 saveVenueBtn.addEventListener('click', async () => {
     const venueName = venueNameInput.value.trim();
     if (!venueName) {
         alert('Veuillez entrer un nom de salle !');
+        return;
+    }
+    if (tables.length === 0) {
+        alert('Ajoutez au moins une table au plan !');
         return;
     }
 
@@ -49,7 +106,7 @@ saveVenueBtn.addEventListener('click', async () => {
         saveVenueBtn.textContent = 'Enregistrement en cours...';
         saveVenueBtn.disabled = true;
 
-        // 1. Création de la salle (Venue)
+        // 1. Créer la salle
         const { data: venueData, error: venueError } = await supabase
             .from('venues')
             .insert([{ name: venueName }])
@@ -57,52 +114,43 @@ saveVenueBtn.addEventListener('click', async () => {
             .single();
 
         if (venueError) throw venueError;
-
         const venueId = venueData.id;
+
+        // 2. Préparer toutes les places de toutes les tables
         const seatsToInsert = [];
-        const rows = currentGrid.length;
-        const cols = currentGrid[0].length;
-
-        // 2. Traduction de la grille visuelle pour la base de données
-        for (let r = 0; r < rows; r++) {
-            for (let c = 0; c < cols; c++) {
-                if (currentGrid[r][c] === 1) {
-                    seatsToInsert.push({
-                        venue_id: venueId,
-                        row_name: String.fromCharCode(65 + r), // Génère les lettres A, B, C...
-                        seat_number: c + 1,
-                        x_coord: c,
-                        y_coord: r,
-                        is_active: true
-                    });
-                }
+        
+        tables.forEach((table, tableIndex) => {
+            for (let i = 1; i <= table.seats; i++) {
+                seatsToInsert.push({
+                    venue_id: venueId,
+                    row_name: table.name, // On utilise row_name pour stocker le nom de la table
+                    seat_number: i,
+                    x_coord: i, // On garde des coordonnées simples pour l'ordre
+                    y_coord: tableIndex, 
+                    is_active: true
+                });
             }
-        }
+        });
 
-        if (seatsToInsert.length === 0) {
-            alert('Salle créée, mais aucune place n\'a été ajoutée au plan.');
-            saveVenueBtn.textContent = 'Enregistrer la salle et les places';
-            saveVenueBtn.disabled = false;
-            return;
-        }
-
-        // 3. Insertion de toutes les places d'un coup (Batch insert)
+        // 3. Envoyer les places (Batch insert)
         const { error: seatsError } = await supabase
             .from('seats')
             .insert(seatsToInsert);
 
         if (seatsError) throw seatsError;
 
-        alert('Succès ! La salle et le plan ont été enregistrés.');
+        alert('🎪 Succès ! La salle et ses tables ont été enregistrées.');
+        tables = [];
+        venueNameInput.value = '';
+        renderPlan();
         
     } catch (error) {
         console.error('Erreur Supabase:', error.message);
         alert('Erreur lors de l\'enregistrement. Vérifie la console.');
     } finally {
-        saveVenueBtn.textContent = 'Enregistrer la salle et les places';
+        saveVenueBtn.textContent = '💾 Enregistrer la salle et son plan';
         saveVenueBtn.disabled = false;
     }
 });
 
-// Génère une grille vide au chargement de la page
-generateGridBtn.click();
+renderPlan();
