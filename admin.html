@@ -11,7 +11,6 @@
         <h1>🛠️ LotoLife Admin</h1>
     </header>
     
-    <!-- Menu de navigation Admin -->
     <nav style="text-align: center; margin: 2rem 0; gap: 15px; display: flex; justify-content: center;">
         <a href="admin.html"><button style="background-color: var(--text-dark);">🏢 1. Créer une Salle</button></a>
         <a href="admin-events.html"><button>🎟️ 2. Créer un Loto</button></a>
@@ -19,21 +18,28 @@
     
     <main>
         <section class="card">
-            <h2>1. Configuration de la Salle</h2>
-            <input type="text" id="venueName" placeholder="Nom de la salle (ex: Salle des Fêtes de Brive)" style="width: 100%; max-width: 400px;">
-            
-            <div style="margin-top: 1rem;">
-                <label>Lignes (Profondeur) : <input type="number" id="gridRows" value="8" min="1"></label>
-                <label>Colonnes (Largeur) : <input type="number" id="gridCols" value="20" min="1"></label>
-                <button id="generateGridBtn" style="font-size: 1rem; padding: 0.5rem 1rem;">Générer la grille</button>
-            </div>
+            <h2>1. Nom de la Salle</h2>
+            <input type="text" id="venueName" placeholder="Ex: Salle Polyvalente de Miremont" style="width: 100%; max-width: 500px;" required>
         </section>
 
         <section class="card">
-            <h2>2. Placer les jetons (Plan de table)</h2>
-            <p>Clique sur la grille pour ajouter/retirer une place. Laisse des lignes vides pour créer les allées entre les longues tables.</p>
-            <div id="seatGrid" class="seat-grid"></div>
-            <button id="saveVenueBtn" style="margin-top: 1.5rem; width: 100%; padding: 1rem; font-size: 1.5rem;">Enregistrer la salle et les jetons</button>
+            <h2>2. Disposer les Tables</h2>
+            <p>Ajoute des tables. Les chaises seront réparties face à face.</p>
+            
+            <div style="display: flex; gap: 15px; flex-wrap: wrap; background: #eee; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <input type="text" id="tableNameInput" placeholder="Nom de la table (ex: Table A)" style="flex: 1; min-width: 200px;">
+                <label style="display: flex; align-items: center; gap: 10px; font-weight: bold;">
+                    Nombre de places : 
+                    <input type="number" id="tableSeatsInput" value="12" min="2" step="2" style="width: 80px;">
+                </label>
+                <button id="addTableBtn" style="margin: 0; background-color: var(--loto-green);">+ Ajouter</button>
+            </div>
+
+            <div id="roomPlan" class="room-plan">
+                <!-- Les tables apparaîtront ici -->
+            </div>
+            
+            <button id="saveVenueBtn" style="margin-top: 2rem; width: 100%; padding: 1rem; font-size: 1.5rem;">💾 Enregistrer la salle et son plan</button>
         </section>
     </main>
 
